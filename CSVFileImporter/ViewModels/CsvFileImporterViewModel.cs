@@ -1,4 +1,5 @@
-﻿using CSVMerger.Core.Models;
+﻿using System;
+using CSVMerger.Core.Models;
 using FolderBrowserEx;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -23,13 +24,27 @@ namespace CSVFileImporter.ViewModels
         private ObservableCollection<StatisticFile> _selectedStatisticFiles = new ObservableCollection<StatisticFile>();
         private StatisticFile _statisticFile;
         private IEventAggregator _eventAggregator;
+        private bool _canAddExecute = false;
         #endregion
 
         #region Properties
+
+        public bool CanAddExecute
+        {
+            get { return _canAddExecute; }
+            set
+            {
+                SetProperty(ref _canAddExecute, value);
+            }
+        }
         public StatisticFile StatisticFile
         {
             get { return _statisticFile; }
-            set { SetProperty(ref _statisticFile, value); }
+            set
+            {
+                SetProperty(ref _statisticFile, value);
+                AddSelectedFileCommand.RaiseCanExecuteChanged();
+            }
         }
         public string HeadLine
         {
@@ -40,7 +55,10 @@ namespace CSVFileImporter.ViewModels
         public ObservableCollection<StatisticFile> StatisticFiles
         {
             get { return _statisticFiles; }
-            set { SetProperty(ref _statisticFiles, value); }
+            set
+            {
+                SetProperty(ref _statisticFiles, value);
+            }
         }
         public ObservableCollection<StatisticFile> SelectedStatisticFiles
         {
@@ -73,13 +91,14 @@ namespace CSVFileImporter.ViewModels
         private void SetupCommands()
         {
             OpenFolderSelectCommand = new DelegateCommand(OpenFolderSelect);
-            AddSelectedFileCommand = new DelegateCommand(AddSelectedFile);
+            AddSelectedFileCommand = new DelegateCommand(AddSelectedFile, CanAddSelectFile);
         }
 
         private void AddSelectedFile()
         {
             _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(StatisticFile);
             StatisticFiles.Remove(StatisticFile);
+            StatisticFile = null;
         }
 
         private void AddFileToStatisticFileList(StatisticFile statisticFile)
@@ -87,6 +106,18 @@ namespace CSVFileImporter.ViewModels
             StatisticFiles.Add(statisticFile);
         }
 
+        private bool CanAddSelectFile()
+        {
+            if (StatisticFile != null && !String.IsNullOrEmpty(StatisticFile.Name))
+            {
+                CanAddExecute = true;
+            }
+            else
+            {
+                CanAddExecute = false;
+            }
+            return CanAddExecute;
+        }
 
         private void OpenFolderSelect()
         {
