@@ -2,24 +2,77 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSVMerger.Core.Events;
+using CSVMerger.Core.Models;
+using Prism.Events;
 
 namespace CSVFileMerger.ViewModels
 {
     public class CsvFileMergerViewModel : BindableBase
     {
-        private string _message;
-        public string Message
+        #region Fields
+        private string _headline;
+        private IEventAggregator _eventAggregator;
+        private ObservableCollection<StatisticFile> _filesToMerge = new ObservableCollection<StatisticFile>();
+        private StatisticFile _selectedFileToRemove;
+        #endregion
+
+        #region Properties
+
+        public StatisticFile SelectedFileToRemove
         {
-            get { return _message; }
-            set { SetProperty(ref _message, value); }
+            get { return _selectedFileToRemove; }
+            set { SetProperty(ref _selectedFileToRemove, value); }
         }
 
-        public CsvFileMergerViewModel()
+        public string Headline
         {
-            Message = "CsvFileMergerView";
+            get { return _headline; }
+            set { SetProperty(ref _headline, value); }
         }
+
+        public ObservableCollection<StatisticFile> FilesToMerge
+        {
+            get => _filesToMerge;
+            set => SetProperty(ref _filesToMerge, value);
+        }
+
+        public DelegateCommand RemoveFileCommand { get; set; }
+
+        #endregion
+
+        #region Constructor
+        public CsvFileMergerViewModel(IEventAggregator eventAggregator)
+        {
+            Headline = "Dateien zusammenführen";
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<FromImporterToMergerEvent>().Subscribe(AddFileToFilesToMerge);
+            SetupCommands();
+        }
+
+        #endregion
+
+        #region Methods
+        private void AddFileToFilesToMerge(StatisticFile fileToAdd)
+        {
+            FilesToMerge.Add(fileToAdd);
+        }
+
+        private void SetupCommands()
+        {
+            RemoveFileCommand = new DelegateCommand(RemoveFileFromMergeList);
+        }
+
+        private void RemoveFileFromMergeList()
+        {
+            _eventAggregator.GetEvent<FromMergerToImporterEvent>().Publish(SelectedFileToRemove);
+            FilesToMerge.Remove(SelectedFileToRemove);
+        }
+
+        #endregion
     }
 }

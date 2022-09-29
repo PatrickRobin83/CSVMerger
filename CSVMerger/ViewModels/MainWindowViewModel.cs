@@ -6,6 +6,7 @@ using CSVFileImporter.Views;
 using CSVFileMerger.ViewModels;
 using CSVFileMerger.Views;
 using FolderBrowserEx;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 
@@ -22,8 +23,9 @@ namespace CSVMerger.ViewModels
         private int _windowHeight = 570;
         private int _windowWidth = 940;
         private string _resizeMode = "NoResize";
+        private readonly IEventAggregator _eventAggregator;
 
-        
+
 
         #endregion
 
@@ -62,10 +64,10 @@ namespace CSVMerger.ViewModels
         #endregion
 
         #region Constructor
-        public MainWindowViewModel(IRegionManager regionManager)
+        public MainWindowViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
-
+            _eventAggregator = eventAggregator;
             SetupViews();
         }
         #endregion
@@ -75,11 +77,11 @@ namespace CSVMerger.ViewModels
         {
             CsvFileMergerView csvFileMergerView = new CsvFileMergerView
             {
-                DataContext = new CsvFileMergerViewModel()
+                DataContext = new CsvFileMergerViewModel(_eventAggregator)
             };
             CsvFileImporterView csvFileImporterView = new CsvFileImporterView()
             {
-                DataContext = new CsvFileImporterViewModel()
+                DataContext = new CsvFileImporterViewModel(_eventAggregator)
             };
             CsvFileExporterView csvFileExporterView = new CsvFileExporterView()
             {

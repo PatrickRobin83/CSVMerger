@@ -1,26 +1,31 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using CSVMerger.Core.Models;
 using FolderBrowserEx;
 using Prism.Commands;
 using Prism.Mvvm;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Forms;
-using CSVMerger.Core.Models;
+using CSVMerger.Core.Events;
+using Prism.Events;
 using FolderBrowserDialog = FolderBrowserEx.FolderBrowserDialog;
+using System.IO.Compression;
 
 
 namespace CSVFileImporter.ViewModels
 {
     public class CsvFileImporterViewModel : BindableBase
     {
-        private readonly IFolderBrowserDialog _folderBrowserDialog;
+        #region Fields
+        private IFolderBrowserDialog _folderBrowserDialog;
         private string _headLine;
         private string _statisticFolder;
         private ObservableCollection<StatisticFile> _statisticFiles = new ObservableCollection<StatisticFile>();
         private ObservableCollection<StatisticFile> _selectedStatisticFiles = new ObservableCollection<StatisticFile>();
         private StatisticFile _statisticFile;
+        private IEventAggregator _eventAggregator;
+        #endregion
 
+        #region Properties
         public StatisticFile StatisticFile
         {
             get { return _statisticFile; }
@@ -43,7 +48,7 @@ namespace CSVFileImporter.ViewModels
             set { SetProperty(ref _selectedStatisticFiles, value); }
         }
         public DelegateCommand OpenFolderSelectCommand { get; set; }
-        public DelegateCommand AddSelectedFilesCommand { get; set; }
+        public DelegateCommand AddSelectedFileCommand { get; set; }
 
         public string StatisticFolder
         {
@@ -51,29 +56,43 @@ namespace CSVFileImporter.ViewModels
             set { SetProperty(ref _statisticFolder, value); }
         }
 
-        public CsvFileImporterViewModel()
+        #endregion
+
+        #region Constructor
+
+        public CsvFileImporterViewModel(IEventAggregator eventAggregator)
         {
             HeadLine = "Datei Import";
-            _folderBrowserDialog = new FolderBrowserDialog();
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<FromMergerToImporterEvent>().Subscribe(AddFileToStatisticFileList);
             SetupCommands();
         }
+        #endregion
 
+        #region Methods
         private void SetupCommands()
         {
             OpenFolderSelectCommand = new DelegateCommand(OpenFolderSelect);
-            AddSelectedFilesCommand = new DelegateCommand(AddSelectedFiles);
+            AddSelectedFileCommand = new DelegateCommand(AddSelectedFile);
         }
 
-        private void AddSelectedFiles()
+        private void AddSelectedFile()
         {
-            SelectedStatisticFiles.Add(StatisticFile);
+            _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(StatisticFile);
             StatisticFiles.Remove(StatisticFile);
         }
 
+        private void AddFileToStatisticFileList(StatisticFile statisticFile)
+        {
+            StatisticFiles.Add(statisticFile);
+        }
+
+
         private void OpenFolderSelect()
         {
+            _folderBrowserDialog = new FolderBrowserDialog();
             _folderBrowserDialog.Title = "Statistik Pfad";
-            _folderBrowserDialog.InitialFolder = @"D:\Projekte\smartPerform\Test_SiemensStatistik\";
+            _folderBrowserDialog.InitialFolder = @"D:\";
             _folderBrowserDialog.AllowMultiSelect = false;
             if (_folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
@@ -91,7 +110,8 @@ namespace CSVFileImporter.ViewModels
                     StatisticFiles.Add(tempFile);
                 }
             }
-            
-        }
+
+        } 
+        #endregion
     }
 }
