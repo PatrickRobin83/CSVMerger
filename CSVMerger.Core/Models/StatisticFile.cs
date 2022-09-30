@@ -10,6 +10,8 @@
  * @Version      1.0.0
  */
 
+using System;
+
 namespace CSVMerger.Core.Models
 {
     public class StatisticFile
@@ -22,6 +24,8 @@ namespace CSVMerger.Core.Models
         public string Name { get; set; }
         public string Path { get; set; }
         public string Extension { get; set; }
+        public DateTime CreationDate { get; set; }
+
         #endregion
 
         #region Constructor

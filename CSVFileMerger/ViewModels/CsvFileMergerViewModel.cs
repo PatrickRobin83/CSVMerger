@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSVMerger.Core.Events;
 using CSVMerger.Core.Models;
+using CSVMerger.Core.Services;
 using Prism.Events;
 
 namespace CSVFileMerger.ViewModels
@@ -80,6 +81,7 @@ namespace CSVFileMerger.ViewModels
             FilesToMerge.Add(fileToAdd);
             if (FilesToMerge.Count > 1)
             {
+                FilesToMerge = CollectionSorterService.SortCollection(FilesToMerge);
                 _eventAggregator.GetEvent<FromMergerToExporterEvent>().Publish(FilesToMerge);
             }
         }

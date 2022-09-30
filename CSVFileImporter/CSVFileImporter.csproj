@@ -4,6 +4,13 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Helper\**" />
+    <EmbeddedResource Remove="Helper\**" />
+    <None Remove="Helper\**" />
+    <Page Remove="Helper\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Blend.Interctivity.WPF.v4.0" Version="1.0.3" />
     <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
   </ItemGroup>
@@ -11,7 +18,6 @@
     <ProjectReference Include="..\CSVMerger.Core\CSVMerger.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Helper\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>

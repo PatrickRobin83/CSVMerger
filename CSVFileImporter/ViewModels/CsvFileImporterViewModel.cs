@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSVMerger.Core.Models;
 using FolderBrowserEx;
 using Prism.Commands;
@@ -10,6 +11,8 @@ using CSVMerger.Core.Events;
 using Prism.Events;
 using FolderBrowserDialog = FolderBrowserEx.FolderBrowserDialog;
 using System.IO.Compression;
+using System.Linq;
+using CSVMerger.Core.Services;
 
 
 namespace CSVFileImporter.ViewModels
@@ -22,6 +25,7 @@ namespace CSVFileImporter.ViewModels
         private string _headLine;
         private string _statisticFolder;
         private ObservableCollection<StatisticFile> _statisticFiles = new ObservableCollection<StatisticFile>();
+        private ObservableCollection<StatisticFile> _selectedFiles = new ObservableCollection<StatisticFile>();
         private StatisticFile _statisticFile;
         private IEventAggregator _eventAggregator;
         private bool _canAddExecute;
@@ -46,7 +50,7 @@ namespace CSVFileImporter.ViewModels
             set
             {
                 SetProperty(ref _statisticFile, value);
-                AddSelectedFileCommand.RaiseCanExecuteChanged();
+                AddSelectedFilesCommand.RaiseCanExecuteChanged();
             }
         }
         public string HeadLine
@@ -64,6 +68,15 @@ namespace CSVFileImporter.ViewModels
             }
         }
 
+        public ObservableCollection<StatisticFile> SelectedFiles
+        {
+            get { return _selectedFiles; }
+            set
+            {
+                SetProperty(ref _selectedFiles, value);
+            }
+        }
+
         public string StatisticFolder
         {
             get { return _statisticFolder; }
@@ -71,13 +84,27 @@ namespace CSVFileImporter.ViewModels
         }
 
         public DelegateCommand OpenFolderSelectCommand { get; set; }
-        public DelegateCommand AddSelectedFileCommand { get; set; }
+        public DelegateCommand AddSelectedFilesCommand { get; set; }
         public DelegateCommand AddAllFilesCommand { get; set; }
 
         public bool CanAddAllFiles
         {
             get { return _canAddAllFiles; }
             set { SetProperty(ref _canAddAllFiles, value); }
+        }
+
+        public System.Collections.IList SelectedItems
+        {
+            get { return SelectedFiles; }
+            set
+            {
+                SelectedFiles.Clear();
+                foreach (StatisticFile statisticFile in value)
+                {
+                    SelectedFiles.Add(statisticFile);
+                }
+                AddSelectedFilesCommand.RaiseCanExecuteChanged();
+            }
         }
 
         #endregion
@@ -99,7 +126,7 @@ namespace CSVFileImporter.ViewModels
         private void SetupCommands()
         {
             OpenFolderSelectCommand = new DelegateCommand(OpenFolderSelect);
-            AddSelectedFileCommand = new DelegateCommand(AddSelectedFile, CanAddSelectFile);
+            AddSelectedFilesCommand = new DelegateCommand(AddSelectedFiles, CanAddSelectFile);
             AddAllFilesCommand = new DelegateCommand(AddAllFiles, CanAddAllFilesExecute);
         }
 
@@ -119,28 +146,31 @@ namespace CSVFileImporter.ViewModels
 
         private void AddAllFiles()
         {
-            ObservableCollection<StatisticFile> tmpList = new ObservableCollection<StatisticFile>(StatisticFiles);
-            
-            foreach (StatisticFile statisticFile in tmpList)
-            {
-                AddSelectedFile(statisticFile);
-            }
-
+            //ObservableCollection<StatisticFile> tmpList = new ObservableCollection<StatisticFile>(StatisticFiles);
+            SelectedFiles = StatisticFiles;
+            AddSelectedFiles();
             StatisticFiles.Clear();
+            SelectedFiles.Clear();
             AddAllFilesCommand.RaiseCanExecuteChanged();
         }
 
-        private void AddSelectedFile()
+        private void AddSelectedFiles()
         {
-            _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(StatisticFile);
-            StatisticFiles.Remove(StatisticFile);
-            StatisticFile = null;
+            ObservableCollection<StatisticFile> tmp = new ObservableCollection<StatisticFile>(SelectedFiles);
+            foreach (StatisticFile statisticFile in tmp)
+            {
+                _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(statisticFile);
+                StatisticFiles.Remove(statisticFile);
+            }
+            SelectedFiles.Clear();
+            tmp.Clear();
+
         }
-        private void AddSelectedFile(StatisticFile file)
-        {
-            _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(file);
-            //StatisticFiles.Remove(file);
-        }
+        //private void AddSelectedFiles(StatisticFile file)
+        //{
+        //    _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(file);
+        //    //StatisticFiles.Remove(file);
+        //}
 
         private void AddFileToStatisticFileList(StatisticFile statisticFile)
         {
@@ -149,7 +179,7 @@ namespace CSVFileImporter.ViewModels
 
         private bool CanAddSelectFile()
         {
-            if (StatisticFile != null && !String.IsNullOrEmpty(StatisticFile.Name))
+            if (SelectedFiles.Count > 0)
             {
                 CanAddExecute = true;
             }
@@ -173,7 +203,6 @@ namespace CSVFileImporter.ViewModels
             }
 
             StatisticFiles.Clear();
-
             foreach (string file in Directory.GetFiles(StatisticFolder))
             {
                 if (Path.GetExtension(file) == ".csv")
@@ -182,12 +211,16 @@ namespace CSVFileImporter.ViewModels
                     tempFile.Name = Path.GetFileName(file);
                     tempFile.Path = Path.GetFullPath(file);
                     tempFile.Extension = Path.GetExtension(file);
+                    tempFile.CreationDate = File.GetCreationTime(Path.GetFullPath(file));
                     StatisticFiles.Add(tempFile);
                 }
             }
+
+            StatisticFiles = CollectionSorterService.SortCollection(StatisticFiles);
+
             AddAllFilesCommand.RaiseCanExecuteChanged();
 
-        } 
+        }
 
         #endregion
     }

@@ -135,6 +135,8 @@ namespace CSVFileExporter.ViewModels
         private void MergeAndExportCsvFile()
         {
             CsvFileMergerService.MergeAndCreateFile(ExportFileName, OutputFolderPath,StatisticFilesToMerge);
+            MessageBox.Show($"Dateien wurden zusammengeführt und liegen unter: {OutputFolderPath}\\{ExportFileName}.csv",
+                "Erfolgreicher Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
