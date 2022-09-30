@@ -15,7 +15,7 @@
                        VerticalAlignment="Center" 
                        FontSize="18"
                        FontWeight="SemiBold"/>
-        <ListBox Margin="0 78 0 0" MinHeight="152"  ItemsSource="{Binding FilesToMerge, Mode=TwoWay}" SelectionMode="Single" SelectedItem="{Binding SelectedFileToRemove, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        <ListBox Margin="0 78 0 0" MaxHeight="152" MinHeight="152"  ItemsSource="{Binding FilesToMerge, Mode=TwoWay}" SelectionMode="Single" SelectedItem="{Binding SelectedFileToRemove, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         <Button Margin="0 10 0 10" Width="200" Content="Datei entfernen" Command="{Binding RemoveFileCommand}"></Button>
     </StackPanel>
 </UserControl>

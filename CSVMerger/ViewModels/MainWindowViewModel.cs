@@ -20,7 +20,7 @@ namespace CSVMerger.ViewModels
         /// </summary>
         private readonly IRegionManager _regionManager;
         private string _title = "CSVMerger";
-        private int _windowHeight = 570;
+        private int _windowHeight = 400;
         private int _windowWidth = 940;
         private string _resizeMode = "NoResize";
         private readonly IEventAggregator _eventAggregator;
@@ -85,7 +85,7 @@ namespace CSVMerger.ViewModels
             };
             CsvFileExporterView csvFileExporterView = new CsvFileExporterView()
             {
-                DataContext = new CsvFileExporterViewModel()
+                DataContext = new CsvFileExporterViewModel(_eventAggregator)
             };
 
         }

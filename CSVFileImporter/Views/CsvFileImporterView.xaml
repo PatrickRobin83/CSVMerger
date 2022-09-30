@@ -15,9 +15,12 @@
                        VerticalAlignment="Center" 
                        FontSize="18"
                        FontWeight="SemiBold"/>
-        <Button Margin="0 10 0 0" Width="200" Content=".csv Dateien importieren" Command="{Binding OpenFolderSelectCommand}"></Button>
+        <Button Margin="0 10 0 0" Width="200" Content=".csv Dateien importieren ..." Command="{Binding OpenFolderSelectCommand}"></Button>
         <TextBlock Margin="0 10 0 5"  Text="Importierte Dateien" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="SemiBold"/>
-        <ListBox Margin="0 10 0 0" MinHeight="150" ItemsSource="{Binding StatisticFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Single" SelectedItem="{Binding StatisticFile,Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Margin="0 10 0 10" Width="200" Content="Hinzufügen >>>" Command="{Binding AddSelectedFileCommand}"></Button>
+        <ListBox Margin="0 10 0 0" MaxHeight="150"  MinHeight="150" ItemsSource="{Binding StatisticFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Single" SelectedItem="{Binding StatisticFile,Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}"/>
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="10 10 0 10" Width="100" Content="Hinzufügen >>>" Command="{Binding AddSelectedFileCommand}"></Button>
+            <Button Margin="50 10 0 10" Width="130" Content="Alle Hinzufügen >>>" Command="{Binding AddAllFilesCommand}"></Button>
+        </StackPanel>
     </StackPanel>
 </UserControl>

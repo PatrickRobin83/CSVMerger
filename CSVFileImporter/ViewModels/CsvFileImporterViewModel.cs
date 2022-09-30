@@ -17,14 +17,16 @@ namespace CSVFileImporter.ViewModels
     public class CsvFileImporterViewModel : BindableBase
     {
         #region Fields
+
         private IFolderBrowserDialog _folderBrowserDialog;
         private string _headLine;
         private string _statisticFolder;
         private ObservableCollection<StatisticFile> _statisticFiles = new ObservableCollection<StatisticFile>();
-        private ObservableCollection<StatisticFile> _selectedStatisticFiles = new ObservableCollection<StatisticFile>();
         private StatisticFile _statisticFile;
         private IEventAggregator _eventAggregator;
-        private bool _canAddExecute = false;
+        private bool _canAddExecute;
+        private bool _canAddAllFiles;
+
         #endregion
 
         #region Properties
@@ -37,6 +39,7 @@ namespace CSVFileImporter.ViewModels
                 SetProperty(ref _canAddExecute, value);
             }
         }
+
         public StatisticFile StatisticFile
         {
             get { return _statisticFile; }
@@ -60,18 +63,21 @@ namespace CSVFileImporter.ViewModels
                 SetProperty(ref _statisticFiles, value);
             }
         }
-        public ObservableCollection<StatisticFile> SelectedStatisticFiles
-        {
-            get { return _selectedStatisticFiles; }
-            set { SetProperty(ref _selectedStatisticFiles, value); }
-        }
-        public DelegateCommand OpenFolderSelectCommand { get; set; }
-        public DelegateCommand AddSelectedFileCommand { get; set; }
 
         public string StatisticFolder
         {
             get { return _statisticFolder; }
             set { SetProperty(ref _statisticFolder, value); }
+        }
+
+        public DelegateCommand OpenFolderSelectCommand { get; set; }
+        public DelegateCommand AddSelectedFileCommand { get; set; }
+        public DelegateCommand AddAllFilesCommand { get; set; }
+
+        public bool CanAddAllFiles
+        {
+            get { return _canAddAllFiles; }
+            set { SetProperty(ref _canAddAllFiles, value); }
         }
 
         #endregion
@@ -85,6 +91,8 @@ namespace CSVFileImporter.ViewModels
             _eventAggregator.GetEvent<FromMergerToImporterEvent>().Subscribe(AddFileToStatisticFileList);
             SetupCommands();
         }
+
+
         #endregion
 
         #region Methods
@@ -92,6 +100,34 @@ namespace CSVFileImporter.ViewModels
         {
             OpenFolderSelectCommand = new DelegateCommand(OpenFolderSelect);
             AddSelectedFileCommand = new DelegateCommand(AddSelectedFile, CanAddSelectFile);
+            AddAllFilesCommand = new DelegateCommand(AddAllFiles, CanAddAllFilesExecute);
+        }
+
+        private bool CanAddAllFilesExecute()
+        {
+            if (StatisticFiles.Count > 0)
+            {
+                CanAddAllFiles = true;
+            }
+            else
+            {
+                CanAddAllFiles = false;
+            }
+
+            return CanAddAllFiles;
+        }
+
+        private void AddAllFiles()
+        {
+            ObservableCollection<StatisticFile> tmpList = new ObservableCollection<StatisticFile>(StatisticFiles);
+            
+            foreach (StatisticFile statisticFile in tmpList)
+            {
+                AddSelectedFile(statisticFile);
+            }
+
+            StatisticFiles.Clear();
+            AddAllFilesCommand.RaiseCanExecuteChanged();
         }
 
         private void AddSelectedFile()
@@ -99,6 +135,11 @@ namespace CSVFileImporter.ViewModels
             _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(StatisticFile);
             StatisticFiles.Remove(StatisticFile);
             StatisticFile = null;
+        }
+        private void AddSelectedFile(StatisticFile file)
+        {
+            _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(file);
+            //StatisticFiles.Remove(file);
         }
 
         private void AddFileToStatisticFileList(StatisticFile statisticFile)
@@ -125,11 +166,14 @@ namespace CSVFileImporter.ViewModels
             _folderBrowserDialog.Title = "Statistik Pfad";
             _folderBrowserDialog.InitialFolder = @"D:\";
             _folderBrowserDialog.AllowMultiSelect = false;
+
             if (_folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
                 StatisticFolder = _folderBrowserDialog.SelectedFolder;
             }
+
             StatisticFiles.Clear();
+
             foreach (string file in Directory.GetFiles(StatisticFolder))
             {
                 if (Path.GetExtension(file) == ".csv")
@@ -141,8 +185,10 @@ namespace CSVFileImporter.ViewModels
                     StatisticFiles.Add(tempFile);
                 }
             }
+            AddAllFilesCommand.RaiseCanExecuteChanged();
 
         } 
+
         #endregion
     }
 }

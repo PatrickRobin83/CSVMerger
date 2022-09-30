@@ -19,6 +19,7 @@ namespace CSVFileMerger.ViewModels
         private IEventAggregator _eventAggregator;
         private ObservableCollection<StatisticFile> _filesToMerge = new ObservableCollection<StatisticFile>();
         private StatisticFile _selectedFileToRemove;
+        private bool _canRemoveExecute = false;
         #endregion
 
         #region Properties
@@ -26,7 +27,12 @@ namespace CSVFileMerger.ViewModels
         public StatisticFile SelectedFileToRemove
         {
             get { return _selectedFileToRemove; }
-            set { SetProperty(ref _selectedFileToRemove, value); }
+            set
+            {
+                SetProperty(ref _selectedFileToRemove, value); 
+                RemoveFileCommand.RaiseCanExecuteChanged();
+            }
+
         }
 
         public string Headline
@@ -37,11 +43,23 @@ namespace CSVFileMerger.ViewModels
 
         public ObservableCollection<StatisticFile> FilesToMerge
         {
-            get => _filesToMerge;
-            set => SetProperty(ref _filesToMerge, value);
+            get { return _filesToMerge; }
+            set
+            {
+                SetProperty(ref _filesToMerge, value);
+            }
         }
 
         public DelegateCommand RemoveFileCommand { get; set; }
+
+        public bool CanRemoveExecute
+        {
+            get { return _canRemoveExecute; }
+            set
+            {
+                SetProperty(ref _canRemoveExecute, value);
+            }
+        }
 
         #endregion
 
@@ -60,17 +78,39 @@ namespace CSVFileMerger.ViewModels
         private void AddFileToFilesToMerge(StatisticFile fileToAdd)
         {
             FilesToMerge.Add(fileToAdd);
+            if (FilesToMerge.Count > 1)
+            {
+                _eventAggregator.GetEvent<FromMergerToExporterEvent>().Publish(FilesToMerge);
+            }
         }
 
         private void SetupCommands()
         {
-            RemoveFileCommand = new DelegateCommand(RemoveFileFromMergeList);
+            RemoveFileCommand = new DelegateCommand(RemoveFileFromMergeList,CanRemoveFileExecute);
         }
 
         private void RemoveFileFromMergeList()
         {
             _eventAggregator.GetEvent<FromMergerToImporterEvent>().Publish(SelectedFileToRemove);
             FilesToMerge.Remove(SelectedFileToRemove);
+            if (FilesToMerge.Count > 1)
+            {
+                _eventAggregator.GetEvent<FromMergerToExporterEvent>().Publish(FilesToMerge);
+            }
+        }
+
+        private bool CanRemoveFileExecute()
+        {
+            if (SelectedFileToRemove != null && !string.IsNullOrEmpty(SelectedFileToRemove.Name))
+            {
+                CanRemoveExecute = true;
+            }
+            else
+            {
+                CanRemoveExecute = false;
+            }
+
+            return CanRemoveExecute;
         }
 
         #endregion
