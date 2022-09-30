@@ -23,7 +23,7 @@ namespace CSVMerger.Core.Services
 
         #region Fields
 
-        private static string _outputfilename;
+        private static string _outputFilename;
         private static string _outputPath;
         private static StatisticFile _mergedFile;
         private static ObservableCollection<StatisticFile> _statisticFiles;
@@ -48,21 +48,21 @@ namespace CSVMerger.Core.Services
         {
             if (outputFileName.EndsWith(".csv"))
             {
-                _outputfilename = outputFileName;
+                _outputFilename = outputFileName;
             }
             else
             {
-                _outputfilename = outputFileName + ".csv";
+                _outputFilename = outputFileName + ".csv";
             }
 
             _outputPath = outputpath;
             _statisticFiles = statisticFiles;
 
-            if (File.Exists(_outputPath + "\\" + outputFileName))
+            if (File.Exists(_outputPath + "\\" + _outputFilename))
             {
-                File.Delete(_outputPath + "\\" + outputFileName);
+                File.Delete(_outputPath + "\\" + _outputFilename);
             }
-            sw = new StreamWriter(_outputPath + "\\" + outputFileName, true);
+            sw = new StreamWriter(_outputPath + "\\" + _outputFilename, true);
 
 
             for (int i = 0; i < statisticFiles.Count; i++)

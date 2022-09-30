@@ -10,4 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CSVMerger.Core\CSVMerger.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helper\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
 </Project>
