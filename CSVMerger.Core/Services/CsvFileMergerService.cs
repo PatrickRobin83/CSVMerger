@@ -12,7 +12,6 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using CSVMerger.Core.Models;
 
@@ -25,7 +24,6 @@ namespace CSVMerger.Core.Services
 
         private static string _outputFilename;
         private static string _outputPath;
-        private static StatisticFile _mergedFile;
         private static ObservableCollection<StatisticFile> _statisticFiles;
         private static List<string> _fileContent;
         private static StreamWriter sw;

@@ -70,6 +70,7 @@ namespace CSVFileMerger.ViewModels
             Headline = "Dateien zusammenführen";
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<FromImporterToMergerEvent>().Subscribe(AddFileToFilesToMerge);
+            _eventAggregator.GetEvent<ClearCollectionsEvent>().Subscribe(ClearMergeFilesCollection);
             SetupCommands();
         }
 
@@ -113,6 +114,10 @@ namespace CSVFileMerger.ViewModels
             }
 
             return CanRemoveExecute;
+        }
+        private void ClearMergeFilesCollection()
+        {
+            ClearCollections.ClearCollection(FilesToMerge);
         }
 
         #endregion

@@ -109,7 +109,7 @@ namespace CSVFileExporter.ViewModels
         {
             _folderBrowserDialog = new FolderBrowserDialog();
             _folderBrowserDialog.Title = "Ausgabeverzeichnis";
-            _folderBrowserDialog.InitialFolder = @"D:\";
+            _folderBrowserDialog.InitialFolder = @"C:\";
             _folderBrowserDialog.AllowMultiSelect = false;
 
             if (_folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -137,6 +137,11 @@ namespace CSVFileExporter.ViewModels
             CsvFileMergerService.MergeAndCreateFile(ExportFileName, OutputFolderPath,StatisticFilesToMerge);
             MessageBox.Show($"Dateien wurden zusammengeführt und liegen unter: {OutputFolderPath}\\{ExportFileName}.csv",
                 "Erfolgreicher Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            _eventAggregator.GetEvent<ClearCollectionsEvent>().Publish();
+            ClearCollections.ClearCollection(StatisticFilesToMerge);
+            OutputFolderPath = "";
+            ExportFileName = "";
+            MergeAndExportFileCommand.RaiseCanExecuteChanged();
         }
 
         #endregion

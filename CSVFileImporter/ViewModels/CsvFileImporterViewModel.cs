@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CSVMerger.Core.Events;
 using CSVMerger.Core.Models;
+using CSVMerger.Core.Services;
 using FolderBrowserEx;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Forms;
-using CSVMerger.Core.Events;
-using Prism.Events;
 using FolderBrowserDialog = FolderBrowserEx.FolderBrowserDialog;
-using System.IO.Compression;
-using System.Linq;
-using CSVMerger.Core.Services;
 
 
 namespace CSVFileImporter.ViewModels
@@ -26,7 +22,6 @@ namespace CSVFileImporter.ViewModels
         private string _statisticFolder;
         private ObservableCollection<StatisticFile> _statisticFiles = new ObservableCollection<StatisticFile>();
         private ObservableCollection<StatisticFile> _selectedFiles = new ObservableCollection<StatisticFile>();
-        private StatisticFile _statisticFile;
         private IEventAggregator _eventAggregator;
         private bool _canAddExecute;
         private bool _canAddAllFiles;
@@ -43,16 +38,6 @@ namespace CSVFileImporter.ViewModels
                 SetProperty(ref _canAddExecute, value);
             }
         }
-
-        public StatisticFile StatisticFile
-        {
-            get { return _statisticFile; }
-            set
-            {
-                SetProperty(ref _statisticFile, value);
-                AddSelectedFilesCommand.RaiseCanExecuteChanged();
-            }
-        }
         public string HeadLine
         {
             get { return _headLine; }
@@ -65,6 +50,7 @@ namespace CSVFileImporter.ViewModels
             set
             {
                 SetProperty(ref _statisticFiles, value);
+
             }
         }
 
@@ -104,6 +90,7 @@ namespace CSVFileImporter.ViewModels
                     SelectedFiles.Add(statisticFile);
                 }
                 AddSelectedFilesCommand.RaiseCanExecuteChanged();
+                AddAllFilesCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -116,16 +103,16 @@ namespace CSVFileImporter.ViewModels
             HeadLine = "Datei Import";
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<FromMergerToImporterEvent>().Subscribe(AddFileToStatisticFileList);
+            _eventAggregator.GetEvent<ClearCollectionsEvent>().Subscribe(ClearFileCollections);
             SetupCommands();
         }
-
 
         #endregion
 
         #region Methods
         private void SetupCommands()
         {
-            OpenFolderSelectCommand = new DelegateCommand(OpenFolderSelect);
+            OpenFolderSelectCommand = new DelegateCommand(SelectImportFolder);
             AddSelectedFilesCommand = new DelegateCommand(AddSelectedFiles, CanAddSelectFile);
             AddAllFilesCommand = new DelegateCommand(AddAllFiles, CanAddAllFilesExecute);
         }
@@ -146,7 +133,6 @@ namespace CSVFileImporter.ViewModels
 
         private void AddAllFiles()
         {
-            //ObservableCollection<StatisticFile> tmpList = new ObservableCollection<StatisticFile>(StatisticFiles);
             SelectedFiles = StatisticFiles;
             AddSelectedFiles();
             StatisticFiles.Clear();
@@ -166,11 +152,6 @@ namespace CSVFileImporter.ViewModels
             tmp.Clear();
 
         }
-        //private void AddSelectedFiles(StatisticFile file)
-        //{
-        //    _eventAggregator.GetEvent<FromImporterToMergerEvent>().Publish(file);
-        //    //StatisticFiles.Remove(file);
-        //}
 
         private void AddFileToStatisticFileList(StatisticFile statisticFile)
         {
@@ -190,11 +171,11 @@ namespace CSVFileImporter.ViewModels
             return CanAddExecute;
         }
 
-        private void OpenFolderSelect()
+        private void SelectImportFolder()
         {
             _folderBrowserDialog = new FolderBrowserDialog();
             _folderBrowserDialog.Title = "Statistik Pfad";
-            _folderBrowserDialog.InitialFolder = @"D:\";
+            _folderBrowserDialog.InitialFolder = @"C:\";
             _folderBrowserDialog.AllowMultiSelect = false;
 
             if (_folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -220,6 +201,12 @@ namespace CSVFileImporter.ViewModels
 
             AddAllFilesCommand.RaiseCanExecuteChanged();
 
+        }
+
+        private void ClearFileCollections()
+        {
+            ClearCollections.ClearCollection(StatisticFiles);
+            ClearCollections.ClearCollection(SelectedFiles);
         }
 
         #endregion
