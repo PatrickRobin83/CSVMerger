@@ -10,6 +10,9 @@
 
 namespace CSVMerger.Core
 {
+    /// <summary>
+    /// Define Regions for Content in Views
+    /// </summary>
     public class RegionNames
     {
         public static string FileImportRegion = "FileImportRegion";

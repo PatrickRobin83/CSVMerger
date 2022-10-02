@@ -14,6 +14,9 @@ using System;
 
 namespace CSVMerger.Core.Models
 {
+    /// <summary>
+    /// Represents a statistic file
+    /// </summary>
     public class StatisticFile
     {
         #region Fields

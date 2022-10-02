@@ -2,10 +2,12 @@
 *----------------------------------------------------------------------------------
 *          Filename:	CollectionSorterService.cs
 *          Date:        2022.10.01
-*          All rights reserved
 *
-*----------------------------------------------------------------------------------
-* @author Patrick Robin <support@rietrob.de>
+*          All rights reserved
+* 
+* -----------------------------------------------------------------------------
+* @author     Patrick Robin <p.robin@smartperform.de>
+* @Version      1.0.0
 */
 
 using CSVMerger.Core.Models;
@@ -14,12 +16,12 @@ using System.Linq;
 
 namespace CSVMerger.Core.Services
 {
+    /// <summary>
+    /// Sort a Observable Collection
+    /// </summary>
     public static class CollectionSorterService
     {
         #region Fields
-
-
-
         #endregion
 
         #region Properties
@@ -31,10 +33,11 @@ namespace CSVMerger.Core.Services
         #endregion
 
         #region Methods
-
-        #endregion
-
-        #region Commands
+        /// <summary>
+        /// Sorts a Observable Collection Ascending by Creation Date
+        /// </summary>
+        /// <param name="statisticFiles">Collection to sort</param>
+        /// <returns>Sorted Observable Collection</returns>
         public static ObservableCollection<StatisticFile> SortCollection(ObservableCollection<StatisticFile> statisticFiles)
         {
             ObservableCollection<StatisticFile> orderedCollection =
@@ -42,6 +45,10 @@ namespace CSVMerger.Core.Services
 
             return orderedCollection;
         }
+        #endregion
+
+        #region Commands
+
         #endregion
     }
 }

@@ -1,17 +1,33 @@
-﻿using System.Reflection.Metadata;
+﻿/*
+ * -----------------------------------------------------------------------------
+ *	 
+ *   Filename		:   MainWindowViewModel.cs
+ *   Date			:   2022-09-29 09:12:01
+ *   All rights reserved
+ * 
+ * -----------------------------------------------------------------------------
+ * @author     Patrick Robin <p.robin@smartperform.de>
+ * @Version      1.0.0
+ */
+
+
 using CSVFileExporter.ViewModels;
 using CSVFileExporter.Views;
 using CSVFileImporter.ViewModels;
 using CSVFileImporter.Views;
 using CSVFileMerger.ViewModels;
 using CSVFileMerger.Views;
-using FolderBrowserEx;
+using CSVMerger.Core.Enums;
+using CSVMerger.Core.Services;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 
 namespace CSVMerger.ViewModels
 {
+    /// <summary>
+    /// ViewModel for the Main View / Main Window
+    /// </summary>
     public class MainWindowViewModel : BindableBase
     {
         #region Fields
@@ -30,12 +46,17 @@ namespace CSVMerger.ViewModels
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Title Main Window
+        /// </summary>
         public string Title
         {
             get { return _title; }
             set { SetProperty(ref _title, value); }
         }
-
+        /// <summary>
+        /// Main Window Height
+        /// </summary>
         public int WindowHeight
         {
             get { return _windowHeight; }
@@ -44,6 +65,9 @@ namespace CSVMerger.ViewModels
                 SetProperty(ref _windowHeight, value);
             }
         }
+        /// <summary>
+        /// Main Window Width
+        /// </summary>
         public int WindowWidth
         {
             get { return _windowWidth; }
@@ -52,6 +76,9 @@ namespace CSVMerger.ViewModels
                 SetProperty(ref _windowWidth, value);
             }
         }
+        /// <summary>
+        /// Defines the Resize Mode for the Main Window
+        /// </summary>
         public string ResizeMode
         {
             get { return _resizeMode; }
@@ -66,14 +93,18 @@ namespace CSVMerger.ViewModels
         #region Constructor
         public MainWindowViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
+            Logger.Log(LogState.Info, "Application Start");
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
-            SetupViews();
+            SetupViewsAndDataContextForTheViews();
         }
         #endregion
 
         #region Methods
-        public void SetupViews()
+        /// <summary>
+        /// Sets up all views an their DataContext
+        /// </summary>
+        public void SetupViewsAndDataContextForTheViews()
         {
             CsvFileMergerView csvFileMergerView = new CsvFileMergerView
             {

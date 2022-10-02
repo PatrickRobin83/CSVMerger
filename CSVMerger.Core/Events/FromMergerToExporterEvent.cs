@@ -16,6 +16,9 @@ using Prism.Events;
 
 namespace CSVMerger.Core.Events
 {
+    /// <summary>
+    /// Event to publish the statistic file from Merger to Exporter
+    /// </summary>
     public class FromMergerToExporterEvent : PubSubEvent<ObservableCollection<StatisticFile>>
     {
         #region Fields
