@@ -14,8 +14,22 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ContentControl Margin="5 5 5 5" Grid.Column="0"  prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileImportRegion}" />
-        <ContentControl Margin="5 5 5 5"   Grid.Column="1" prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileMergeRegion}"/>
-        <ContentControl Margin="5 5 5 5" Grid.Column="2" prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileOutputRegion}"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ContentControl Grid.Row="0" Margin="5 5 5 5" Grid.Column="0"  
+                        prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileImportRegion}" />
+
+        <ContentControl Grid.Row="0" Margin="5 5 5 5"   Grid.Column="1" 
+                        prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileMergeRegion}"/>
+
+        <ContentControl Grid.Row="0"  Margin="5 5 5 5" Grid.Column="2" 
+                        prism:RegionManager.RegionName="{x:Static csvCore:RegionNames.FileOutputRegion}"/>
+
+        <Button Grid.Row="1" Grid.ColumnSpan="3" Content="Exit" HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom" Margin="0 10 5 0" Padding="5" Width="100" Height="30" 
+                Command="{Binding ApplicationExitCommand}"/>
     </Grid>
 </Window>

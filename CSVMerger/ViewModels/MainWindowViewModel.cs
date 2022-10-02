@@ -11,6 +11,7 @@
  */
 
 
+using System;
 using CSVFileExporter.ViewModels;
 using CSVFileExporter.Views;
 using CSVFileImporter.ViewModels;
@@ -19,6 +20,7 @@ using CSVFileMerger.ViewModels;
 using CSVFileMerger.Views;
 using CSVMerger.Core.Enums;
 using CSVMerger.Core.Services;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -88,6 +90,8 @@ namespace CSVMerger.ViewModels
             }
         }
 
+        public DelegateCommand ApplicationExitCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -97,6 +101,7 @@ namespace CSVMerger.ViewModels
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
             SetupViewsAndDataContextForTheViews();
+            InitializeCommands();
         }
         #endregion
 
@@ -119,6 +124,17 @@ namespace CSVMerger.ViewModels
                 DataContext = new CsvFileExporterViewModel(_eventAggregator)
             };
 
+        }
+
+        private void InitializeCommands()
+        {
+            ApplicationExitCommand = new DelegateCommand(ShutdownApp);
+        }
+
+        private void ShutdownApp()
+        {
+            Logger.Log(LogState.Info, "User initialized shutdown");
+            Environment.Exit(0);
         }
 
         #endregion
