@@ -143,7 +143,7 @@ namespace CSVFileImporter.ViewModels
 
         public CsvFileImporterViewModel(IEventAggregator eventAggregator)
         {
-            HeadLine = "Datei Import";
+            HeadLine = "Import";
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<FromMergerToImporterEvent>().Subscribe(AddFileToStatisticFileList);
             _eventAggregator.GetEvent<ClearCollectionsEvent>().Subscribe(ClearFileCollections);
