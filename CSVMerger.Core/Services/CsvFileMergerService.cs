@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
 using System.IO;
 using CSVMerger.Core.Enums;
 using CSVMerger.Core.Models;
@@ -40,6 +41,7 @@ namespace CSVMerger.Core.Services
 
         #region Properties
 
+        public static string OutputFileName;
         #endregion
 
         #region Constructor
@@ -53,7 +55,7 @@ namespace CSVMerger.Core.Services
         /// <param name="outputFileName">Name of the output file</param>
         /// <param name="outputpath">Path for the output file</param>
         /// <param name="statisticFiles">Collection of .csv files to merge</param>
-        public static void MergeAndCreateFile(string outputFileName, string outputpath,
+        public static string MergeAndCreateFile(string outputFileName, string outputpath,
             ObservableCollection<StatisticFile> statisticFiles)
         {
             if (outputFileName.EndsWith(".csv"))
@@ -76,6 +78,7 @@ namespace CSVMerger.Core.Services
                     _outputFilename = $"{outputFileName}_{_fileExistNameAppendix}{_outputfileExtension}";
                 }
                 sw = new StreamWriter($@"{_outputPath}\{_outputFilename}", true);
+                OutputFileName = _outputFilename;
 
 
                 for (int i = 0; i < statisticFiles.Count; i++)
@@ -104,6 +107,8 @@ namespace CSVMerger.Core.Services
             {
                 Logger.Log(LogState.Error, ex.Message);
             }
+
+            return OutputFileName;
         }
         #endregion
 

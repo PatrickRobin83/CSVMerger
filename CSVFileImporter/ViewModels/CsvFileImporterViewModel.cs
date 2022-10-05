@@ -189,6 +189,7 @@ namespace CSVFileImporter.ViewModels
             StatisticFiles.Clear();
             SelectedFiles.Clear();
             AddAllFilesCommand.RaiseCanExecuteChanged();
+            AddSelectedFilesCommand.RaiseCanExecuteChanged();
         }
         /// <summary>
         /// Adds the selected files from the imported files collection to the merge file collection
@@ -203,6 +204,9 @@ namespace CSVFileImporter.ViewModels
             }
             SelectedFiles.Clear();
             tmp.Clear();
+            AddAllFilesCommand.RaiseCanExecuteChanged();
+            AddSelectedFilesCommand.RaiseCanExecuteChanged();
+
 
         }
         /// <summary>
@@ -212,6 +216,11 @@ namespace CSVFileImporter.ViewModels
         private void AddFileToStatisticFileList(StatisticFile statisticFile)
         {
             StatisticFiles.Add(statisticFile);
+            if (StatisticFiles.Count > 1)
+            {
+                AddAllFilesCommand.RaiseCanExecuteChanged();
+            }
+            AddSelectedFilesCommand.RaiseCanExecuteChanged();
         }
         /// <summary>
         /// Checks whether the button AddAllFiles can be pressed or whether it must be deactivated.

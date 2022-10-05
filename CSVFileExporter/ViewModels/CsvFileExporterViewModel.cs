@@ -35,6 +35,7 @@ namespace CSVFileExporter.ViewModels
         private string _outputFolderPath;
         private IFolderBrowserDialog _folderBrowserDialog;
         private string _exportFileName = "";
+        private string _newOutPutFileName;
 
         #endregion
 
@@ -169,8 +170,8 @@ namespace CSVFileExporter.ViewModels
         /// </summary>
         private void MergeAndExportCsvFile()
         {
-            CsvFileMergerService.MergeAndCreateFile(ExportFileName, OutputFolderPath,StatisticFilesToMerge);
-            MessageBox.Show($"Dateien wurden zusammengeführt und liegen unter: {OutputFolderPath}\\{ExportFileName}.csv",
+            _newOutPutFileName = CsvFileMergerService.MergeAndCreateFile(ExportFileName, OutputFolderPath,StatisticFilesToMerge);
+            MessageBox.Show($"Dateien wurden zusammengeführt und liegen unter: {OutputFolderPath}\\{_newOutPutFileName}",
                 "Erfolgreicher Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
             Logger.Log(LogState.Info, "Success Files Merged and Exported");
             _eventAggregator.GetEvent<ClearCollectionsEvent>().Publish();
